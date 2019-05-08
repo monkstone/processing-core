@@ -38,21 +38,20 @@ public class TgaImageSaveStrategy implements ImageSaveStrategy {
 
   /**
    * Creates a Targa32 formatted byte sequence of specified
-   * pixel buffer using RLE compression.
-   * </p>
-   * Also figured out how to avoid parsing the image upside-down
-   * (there's a header flag to set the image origin to top-left)
-   * </p>
-   * Starting with revision 0092, the format setting is taken into account:
-   * <UL>
-   * <LI><TT>ALPHA</TT> images written as 8bit grayscale (uses lowest byte)
-   * <LI><TT>RGB</TT> &rarr; 24 bits
-   * <LI><TT>ARGB</TT> &rarr; 32 bits
-   * </UL>
-   * All versions are RLE compressed.
-   * </p>
+   * pixel buffer using RLE compression.Also figured out how to avoid parsing the image upside-down
+ (there's a header flag to set the image origin to top-left)
+ 
+ Starting with revision 0092, the format setting is taken into account:
+    <UL>
+    <LI><TT>ALPHA</TT> images written as 8bit grayscale (uses lowest byte)
+    <LI><TT>RGB</TT> &rarr; 24 bits
+    <LI><TT>ARGB</TT> &rarr; 32 bits
+    </UL>
+ All versions are RLE compressed.
+   * 
    * Contributed by toxi 8-10 May 2005, based on this RLE
-   * <A HREF="http://www.wotsit.org/download.asp?f=tga">specification</A>
+ <A HREF="http://www.wotsit.org/download.asp?f=tga">specification</A>
+     * @throws java.io.FileNotFoundException
    */
   @Override
   public boolean save(int[] pixels, int pixelWidth, int pixelHeight, int format,
@@ -62,24 +61,26 @@ public class TgaImageSaveStrategy implements ImageSaveStrategy {
 
     byte header[] = new byte[18];
 
-    if (format == PConstants.ALPHA) {  // save ALPHA images as 8bit grayscale
-      header[2] = 0x0B;
-      header[16] = 0x08;
-      header[17] = 0x28;
-
-    } else if (format == PConstants.RGB) {
-      header[2] = 0x0A;
-      header[16] = 24;
-      header[17] = 0x20;
-
-    } else if (format == PConstants.ARGB) {
-      header[2] = 0x0A;
-      header[16] = 32;
-      header[17] = 0x28;
-
-    } else {
-      throw new RuntimeException("Image format not recognized inside save()");
-    }
+      switch (format) {
+          case PConstants.ALPHA:
+              // save ALPHA images as 8bit grayscale
+              header[2] = 0x0B;
+              header[16] = 0x08;
+              header[17] = 0x28;
+              break;
+          case PConstants.RGB:
+              header[2] = 0x0A;
+              header[16] = 24;
+              header[17] = 0x20;
+              break;
+          case PConstants.ARGB:
+              header[2] = 0x0A;
+              header[16] = 32;
+              header[17] = 0x28;
+              break;
+          default:
+              throw new RuntimeException("Image format not recognized inside save()");
+      }
     // set image dimensions lo-hi byte order
     header[12] = (byte) (pixelWidth & 0xff);
     header[13] = (byte) (pixelWidth >> 8);

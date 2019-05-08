@@ -116,6 +116,7 @@ public class PShapeSVG extends PShape {
 
   /**
    * Initializes a new SVG object from the given XML object.
+     * @param svg
    */
   public PShapeSVG(XML svg) {
     this(null, svg, true);
@@ -1085,41 +1086,38 @@ public class PShapeSVG extends PShape {
       return null;
     }
     float[] m = PApplet.parseFloat(PApplet.splitTokens(pieces[2], ", "));
-    if (pieces[1].equals("matrix")) {
-      return new PMatrix2D(m[0], m[2], m[4], m[1], m[3], m[5]);
-
-    } else if (pieces[1].equals("translate")) {
-      float tx = m[0];
-      float ty = (m.length == 2) ? m[1] : m[0];
-      return new PMatrix2D(1, 0, tx, 0, 1, ty);
-
-    } else if (pieces[1].equals("scale")) {
-      float sx = m[0];
-      float sy = (m.length == 2) ? m[1] : m[0];
-      return new PMatrix2D(sx, 0, 0,  0, sy, 0);
-
-    } else if (pieces[1].equals("rotate")) {
-      float angle = m[0];
-
-      if (m.length == 1) {
-        float c = PApplet.cos(angle);
-        float s = PApplet.sin(angle);
-        // SVG version is cos(a) sin(a) -sin(a) cos(a) 0 0
-        return new PMatrix2D(c, -s, 0, s, c, 0);
-
-      } else if (m.length == 3) {
-        PMatrix2D mat = new PMatrix2D(0, 1, m[1],  1, 0, m[2]);
-        mat.rotate(m[0]);
-        mat.translate(-m[1], -m[2]);
-        return mat;
+      switch (pieces[1]) {
+          case "matrix":
+              return new PMatrix2D(m[0], m[2], m[4], m[1], m[3], m[5]);
+          case "translate":
+              float tx = m[0];
+              float ty = (m.length == 2) ? m[1] : m[0];
+              return new PMatrix2D(1, 0, tx, 0, 1, ty);
+          case "scale":
+              float sx = m[0];
+              float sy = (m.length == 2) ? m[1] : m[0];
+              return new PMatrix2D(sx, 0, 0,  0, sy, 0);
+          case "rotate":
+              float angle = m[0];
+              if (m.length == 1) {
+                  float c = PApplet.cos(angle);
+                  float s = PApplet.sin(angle);
+                  // SVG version is cos(a) sin(a) -sin(a) cos(a) 0 0
+                  return new PMatrix2D(c, -s, 0, s, c, 0);
+                  
+              } else if (m.length == 3) {
+                  PMatrix2D mat = new PMatrix2D(0, 1, m[1],  1, 0, m[2]);
+                  mat.rotate(m[0]);
+                  mat.translate(-m[1], -m[2]);
+                  return mat;
+              }       break;
+          case "skewX":
+              return new PMatrix2D(1, 0, 1,  PApplet.tan(m[0]), 0, 0);
+          case "skewY":
+              return new PMatrix2D(1, 0, 1,  0, PApplet.tan(m[0]), 0);
+          default:
+              break;
       }
-
-    } else if (pieces[1].equals("skewX")) {
-      return new PMatrix2D(1, 0, 1,  PApplet.tan(m[0]), 0, 0);
-
-    } else if (pieces[1].equals("skewY")) {
-      return new PMatrix2D(1, 0, 1,  0, PApplet.tan(m[0]), 0);
-    }
     return null;
   }
 
@@ -1172,41 +1170,41 @@ public class PShapeSVG extends PShape {
       String styleText = properties.getString("style");
       String[] styleTokens = PApplet.splitTokens(styleText, ";");
 
-      //PApplet.println(styleTokens);
-      for (int i = 0; i < styleTokens.length; i++) {
-        String[] tokens = PApplet.splitTokens(styleTokens[i], ":");
-        //PApplet.println(tokens);
-
-        tokens[0] = PApplet.trim(tokens[0]);
-
-        if (tokens[0].equals("fill")) {
-          setColor(tokens[1], true);
-
-        } else if(tokens[0].equals("fill-opacity")) {
-          setFillOpacity(tokens[1]);
-
-        } else if(tokens[0].equals("stroke")) {
-          setColor(tokens[1], false);
-
-        } else if(tokens[0].equals("stroke-width")) {
-          setStrokeWeight(tokens[1]);
-
-        } else if(tokens[0].equals("stroke-linecap")) {
-          setStrokeCap(tokens[1]);
-
-        } else if(tokens[0].equals("stroke-linejoin")) {
-          setStrokeJoin(tokens[1]);
-
-        } else if(tokens[0].equals("stroke-opacity")) {
-          setStrokeOpacity(tokens[1]);
-
-        } else if(tokens[0].equals("opacity")) {
-          setOpacity(tokens[1]);
-
-        } else {
+        //PApplet.println(styleTokens);
+        for (String styleToken : styleTokens) {
+            String[] tokens = PApplet.splitTokens(styleToken, ":");
+            //PApplet.println(tokens);
+            tokens[0] = PApplet.trim(tokens[0]);
+          switch (tokens[0]) {
+              case "fill":
+                  setColor(tokens[1], true);
+                  break;
+              case "fill-opacity":
+                  setFillOpacity(tokens[1]);
+                  break;
+              case "stroke":
+                  setColor(tokens[1], false);
+                  break;
+              case "stroke-width":
+                  setStrokeWeight(tokens[1]);
+                  break;
+              case "stroke-linecap":
+                  setStrokeCap(tokens[1]);
+                  break;
+              case "stroke-linejoin":
+                  setStrokeJoin(tokens[1]);
+                  break;
+              case "stroke-opacity":
+                  setStrokeOpacity(tokens[1]);
+                  break;
+              case "opacity":
+                  setOpacity(tokens[1]);
+                  break;
           // Other attributes are not yet implemented
+              default:
+                  break;
+          }
         }
-      }
     }
   }
 
@@ -1230,34 +1228,42 @@ public class PShapeSVG extends PShape {
 
 
   void setStrokeJoin(String linejoin) {
-    if (linejoin.equals("inherit")) {
+      switch (linejoin) {
       // do nothing, will inherit automatically
-
-    } else if (linejoin.equals("miter")) {
-      strokeJoin = PConstants.MITER;
-
-    } else if (linejoin.equals("round")) {
-      strokeJoin = PConstants.ROUND;
-
-    } else if (linejoin.equals("bevel")) {
-      strokeJoin = PConstants.BEVEL;
-    }
+          case "inherit":
+              break;
+          case "miter":
+              strokeJoin = PConstants.MITER;
+              break;
+          case "round":
+              strokeJoin = PConstants.ROUND;
+              break;
+          case "bevel":
+              strokeJoin = PConstants.BEVEL;
+              break;
+          default:
+              break;
+      }
   }
 
 
   void setStrokeCap(String linecap) {
-    if (linecap.equals("inherit")) {
+      switch (linecap) {
       // do nothing, will inherit automatically
-
-    } else if (linecap.equals("butt")) {
-      strokeCap = PConstants.SQUARE;
-
-    } else if (linecap.equals("round")) {
-      strokeCap = PConstants.ROUND;
-
-    } else if (linecap.equals("square")) {
-      strokeCap = PConstants.PROJECT;
-    }
+          case "inherit":
+              break;
+          case "butt":
+              strokeCap = PConstants.SQUARE;
+              break;
+          case "round":
+              strokeCap = PConstants.ROUND;
+              break;
+          case "square":
+              strokeCap = PConstants.PROJECT;
+              break;
+          default:
+              break;
+      }
   }
 
 
@@ -1310,8 +1316,8 @@ public class PShapeSVG extends PShape {
 
 
   /**
-   * Parses the "color" datatype only, and prints an error if it is not of this form.
-   * http://www.w3.org/TR/SVG/types.html#DataTypeColor
+   * Parses the "color" datatype only, and prints an error if it is not of this form.http://www.w3.org/TR/SVG/types.html#DataTypeColor
+     * @param colorText
    * @return 0xRRGGBB (no alpha). Zero on error.
    */
   static protected int parseSimpleColor(String colorText) {
@@ -1412,11 +1418,11 @@ public class PShapeSVG extends PShape {
 //    if (style == null) return table;
     if (style != null) {
       String[] pieces = style.split(";");
-      for (int i = 0; i < pieces.length; i++) {
-        String[] parts = pieces[i].split(":");
-        //table.put(parts[0], parts[1]);
-        table.set(parts[0], parts[1]);
-      }
+        for (String piece : pieces) {
+            String[] parts = piece.split(":");
+            //table.put(parts[0], parts[1]);
+            table.set(parts[0], parts[1]);
+        }
     }
     return table;
   }
@@ -1439,19 +1445,20 @@ public class PShapeSVG extends PShape {
 
 
   /**
-   * Parse a size that may have a suffix for its units.
-   * This assumes 90dpi, which implies, as given in the
-   * <A HREF="http://www.w3.org/TR/SVG/coords.html#Units">units</A> spec:
-   * <UL>
-   * <LI>"1pt" equals "1.25px" (and therefore 1.25 user units)
-   * <LI>"1pc" equals "15px" (and therefore 15 user units)
-   * <LI>"1mm" would be "3.543307px" (3.543307 user units)
-   * <LI>"1cm" equals "35.43307px" (and therefore 35.43307 user units)
-   * <LI>"1in" equals "90px" (and therefore 90 user units)
-   * </UL>
+   * Parse a size that may have a suffix for its units.This assumes 90dpi, which implies, as given in the
+    <A HREF="http://www.w3.org/TR/SVG/coords.html#Units">units</A> spec:
+    <UL>
+    <LI>"1pt" equals "1.25px" (and therefore 1.25 user units)
+    <LI>"1pc" equals "15px" (and therefore 15 user units)
+    <LI>"1mm" would be "3.543307px" (3.543307 user units)
+    <LI>"1cm" equals "35.43307px" (and therefore 35.43307 user units)
+    <LI>"1in" equals "90px" (and therefore 90 user units)
+    </UL>
+     * @param text
    * @param relativeTo (float) Used for %. When relative to viewbox, should
    *    be svgWidth for horizontal dimentions, svgHeight for vertical, and
    *    svgXYSize for anything else.
+     * @return 
    */
   static protected float parseUnitSize(String text, float relativeTo) {
     int len = text.length() - 2;
@@ -1503,34 +1510,33 @@ public class PShapeSVG extends PShape {
       offset = new float[elements.length];
       color = new int[elements.length];
 
-      // <stop  offset="0" style="stop-color:#967348"/>
-      for (int i = 0; i < elements.length; i++) {
-        XML elem = elements[i];
-        String name = elem.getName();
-        if (name.equals("stop")) {
-          String offsetAttr = elem.getString("offset");
-          offset[count] = parseFloatOrPercent(offsetAttr);
-
-          String style = elem.getString("style");
-          //Map<String, String> styles = parseStyleAttributes(style);
-          StringDict styles = parseStyleAttributes(style);
-
-          String colorStr = styles.get("stop-color");
-          if (colorStr == null) {
-            colorStr = elem.getString("stop-color");
-            if (colorStr == null) colorStr = "#000000";
-          }
-          String opacityStr = styles.get("stop-opacity");
-          if (opacityStr == null) {
-            opacityStr = elem.getString("stop-opacity");
-            if (opacityStr == null) opacityStr = "1";
-          }
-          int tupacity = PApplet.constrain(
-                          (int)(PApplet.parseFloat(opacityStr) * 255), 0, 255);
-          color[count] = (tupacity << 24) | parseSimpleColor(colorStr);
-          count++;
+        // <stop  offset="0" style="stop-color:#967348"/>
+        for (XML elem : elements) {
+            String name = elem.getName();
+            if (name.equals("stop")) {
+                String offsetAttr = elem.getString("offset");
+                offset[count] = parseFloatOrPercent(offsetAttr);
+                
+                String style = elem.getString("style");
+                //Map<String, String> styles = parseStyleAttributes(style);
+                StringDict styles = parseStyleAttributes(style);
+                
+                String colorStr = styles.get("stop-color");
+                if (colorStr == null) {
+                    colorStr = elem.getString("stop-color");
+                    if (colorStr == null) colorStr = "#000000";
+                }
+                String opacityStr = styles.get("stop-opacity");
+                if (opacityStr == null) {
+                    opacityStr = elem.getString("stop-opacity");
+                    if (opacityStr == null) opacityStr = "1";
+                }
+                int tupacity = PApplet.constrain(
+                        (int)(PApplet.parseFloat(opacityStr) * 255), 0, 255);
+                color[count] = (tupacity << 24) | parseSimpleColor(colorStr);
+                count++;
+            }
         }
-      }
       offset = PApplet.subset(offset, 0, count);
       color = PApplet.subset(color, 0, count);
     }
@@ -1848,7 +1854,7 @@ public class PShapeSVG extends PShape {
       char[] c = str.toCharArray();
       for (int i = 0; i < c.length; i++) {
         // call draw on each char (pulling it w/ the unicode table)
-        FontGlyph fg = unicodeGlyphs.get(Character.valueOf(c[i]));
+        FontGlyph fg = unicodeGlyphs.get(c[i]);
         if (fg != null) {
           fg.draw(g);
           // add horizAdvX/unitsPerEm to the x coordinate along the way
@@ -1866,7 +1872,7 @@ public class PShapeSVG extends PShape {
       float s =  size / face.unitsPerEm;
       g.translate(x, y);
       g.scale(s, -s);
-      FontGlyph fg = unicodeGlyphs.get(Character.valueOf(c));
+      FontGlyph fg = unicodeGlyphs.get(c);
       if (fg != null) g.shape(fg);
       g.popMatrix();
     }
@@ -1877,7 +1883,7 @@ public class PShapeSVG extends PShape {
       char[] c = str.toCharArray();
       for (int i = 0; i < c.length; i++) {
         // call draw on each char (pulling it w/ the unicode table)
-        FontGlyph fg = unicodeGlyphs.get(Character.valueOf(c[i]));
+        FontGlyph fg = unicodeGlyphs.get(c[i]);
         if (fg != null) {
           w += (float) fg.horizAdvX / face.unitsPerEm;
         }
@@ -1966,15 +1972,17 @@ public class PShapeSVG extends PShape {
 
 
   /**
-   * Get a particular element based on its SVG ID. When editing SVG by hand,
-   * this is the id="" tag on any SVG element. When editing from Illustrator,
-   * these IDs can be edited by expanding the layers palette. The names used
-   * in the layers palette, both for the layers or the shapes and groups
-   * beneath them can be used here.
-   * <PRE>
+   * Get a particular element based on its SVG ID.When editing SVG by hand,
+ this is the id="" tag on any SVG element.When editing from Illustrator,
+ these IDs can be edited by expanding the layers palette. The names used
+ in the layers palette, both for the layers or the shapes and groups
+ beneath them can be used here.
+ <PRE>
    * // This code grabs "Layer 3" and the shapes beneath it.
    * PShape layer3 = svg.getChild("Layer 3");
    * </PRE>
+     * @param name
+     * @return 
    */
   @Override
   public PShape getChild(String name) {

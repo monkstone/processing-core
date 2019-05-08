@@ -83,7 +83,6 @@ public class TiffImageSaveStrategy implements ImageSaveStrategy {
       return true;
 
     } catch (IOException e) {
-      e.printStackTrace();
     }
     return false;
   }

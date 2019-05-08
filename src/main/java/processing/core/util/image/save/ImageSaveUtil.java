@@ -40,6 +40,7 @@ public class ImageSaveUtil {
    *
    * @param filename The filename at which the output stream should be created.
    * @return The newly created output stream.
+     * @throws java.io.FileNotFoundException
    */
   public static OutputStream createForFile(String filename) throws FileNotFoundException {
     return new BufferedOutputStream(new FileOutputStream(filename), 32768);

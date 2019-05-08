@@ -256,6 +256,7 @@ public class PGraphicsJava2D extends PGraphics {
   /**
    * Still need a means to get the java.awt.Image object, since getNative()
    * is going to return the {@link Graphics2D} object.
+     * @return 
    */
   @Override
   public Image getImage() {
@@ -263,7 +264,8 @@ public class PGraphicsJava2D extends PGraphics {
   }
 
 
-  /** Returns the java.awt.Graphics2D object used by this renderer. */
+  /** Returns the java.awt.Graphics2D object used by this renderer.
+     * @return  */
   @Override
   public Object getNative() {
     return g2;

@@ -677,15 +677,22 @@ public class PShader implements PConstants {
                                   int length) {
     if (-1 < loc) {
       updateIntBuffer(vec);
-      if (ncoords == 1) {
-        pgl.uniform1iv(loc, length, intBuffer);
-      } else if (ncoords == 2) {
-        pgl.uniform2iv(loc, length, intBuffer);
-      } else if (ncoords == 3) {
-        pgl.uniform3iv(loc, length, intBuffer);
-      } else if (ncoords == 4) {
-        pgl.uniform3iv(loc, length, intBuffer);
-      }
+        switch (ncoords) {
+            case 1:
+                pgl.uniform1iv(loc, length, intBuffer);
+                break;
+            case 2:
+                pgl.uniform2iv(loc, length, intBuffer);
+                break;
+            case 3:
+                pgl.uniform3iv(loc, length, intBuffer);
+                break;
+            case 4:
+                pgl.uniform3iv(loc, length, intBuffer);
+                break;
+            default:
+                break;
+        }
     }
   }
 
@@ -694,15 +701,22 @@ public class PShader implements PConstants {
                                   int length) {
     if (-1 < loc) {
       updateFloatBuffer(vec);
-      if (ncoords == 1) {
-        pgl.uniform1fv(loc, length, floatBuffer);
-      } else if (ncoords == 2) {
-        pgl.uniform2fv(loc, length, floatBuffer);
-      } else if (ncoords == 3) {
-        pgl.uniform3fv(loc, length, floatBuffer);
-      } else if (ncoords == 4) {
-        pgl.uniform4fv(loc, length, floatBuffer);
-      }
+        switch (ncoords) {
+            case 1:
+                pgl.uniform1fv(loc, length, floatBuffer);
+                break;
+            case 2:
+                pgl.uniform2fv(loc, length, floatBuffer);
+                break;
+            case 3:
+                pgl.uniform3fv(loc, length, floatBuffer);
+                break;
+            case 4:
+                pgl.uniform4fv(loc, length, floatBuffer);
+                break;
+            default:
+                break;
+        }
     }
   }
 
@@ -754,91 +768,149 @@ public class PShader implements PConstants {
           continue;
         }
         UniformValue val = uniformValues.get(name);
-        if (val.type == UniformValue.INT1) {
-          int[] v = ((int[])val.value);
-          pgl.uniform1i(loc, v[0]);
-        } else if (val.type == UniformValue.INT2) {
-          int[] v = ((int[])val.value);
-          pgl.uniform2i(loc, v[0], v[1]);
-        } else if (val.type == UniformValue.INT3) {
-          int[] v = ((int[])val.value);
-          pgl.uniform3i(loc, v[0], v[1], v[2]);
-        } else if (val.type == UniformValue.INT4) {
-          int[] v = ((int[])val.value);
-          pgl.uniform4i(loc, v[0], v[1], v[2], v[3]);
-        } else if (val.type == UniformValue.FLOAT1) {
-          float[] v = ((float[])val.value);
-          pgl.uniform1f(loc, v[0]);
-        } else if (val.type == UniformValue.FLOAT2) {
-          float[] v = ((float[])val.value);
-          pgl.uniform2f(loc, v[0], v[1]);
-        } else if (val.type == UniformValue.FLOAT3) {
-          float[] v = ((float[])val.value);
-          pgl.uniform3f(loc, v[0], v[1], v[2]);
-        } else if (val.type == UniformValue.FLOAT4) {
-          float[] v = ((float[])val.value);
-          pgl.uniform4f(loc, v[0], v[1], v[2], v[3]);
-        } else if (val.type == UniformValue.INT1VEC) {
-          int[] v = ((int[])val.value);
-          updateIntBuffer(v);
-          pgl.uniform1iv(loc, v.length, intBuffer);
-        } else if (val.type == UniformValue.INT2VEC) {
-          int[] v = ((int[])val.value);
-          updateIntBuffer(v);
-          pgl.uniform2iv(loc, v.length / 2, intBuffer);
-        } else if (val.type == UniformValue.INT3VEC) {
-          int[] v = ((int[])val.value);
-          updateIntBuffer(v);
-          pgl.uniform3iv(loc, v.length / 3, intBuffer);
-        } else if (val.type == UniformValue.INT4VEC) {
-          int[] v = ((int[])val.value);
-          updateIntBuffer(v);
-          pgl.uniform4iv(loc, v.length / 4, intBuffer);
-        } else if (val.type == UniformValue.FLOAT1VEC) {
-          float[] v = ((float[])val.value);
-          updateFloatBuffer(v);
-          pgl.uniform1fv(loc, v.length, floatBuffer);
-        } else if (val.type == UniformValue.FLOAT2VEC) {
-          float[] v = ((float[])val.value);
-          updateFloatBuffer(v);
-          pgl.uniform2fv(loc, v.length / 2, floatBuffer);
-        } else if (val.type == UniformValue.FLOAT3VEC) {
-          float[] v = ((float[])val.value);
-          updateFloatBuffer(v);
-          pgl.uniform3fv(loc, v.length / 3, floatBuffer);
-        } else if (val.type == UniformValue.FLOAT4VEC) {
-          float[] v = ((float[])val.value);
-          updateFloatBuffer(v);
-          pgl.uniform4fv(loc, v.length / 4, floatBuffer);
-        } else if (val.type == UniformValue.MAT2) {
-          float[] v = ((float[])val.value);
-          updateFloatBuffer(v);
-          pgl.uniformMatrix2fv(loc, 1, false, floatBuffer);
-        } else if (val.type == UniformValue.MAT3) {
-          float[] v = ((float[])val.value);
-          updateFloatBuffer(v);
-          pgl.uniformMatrix3fv(loc, 1, false, floatBuffer);
-        } else if (val.type == UniformValue.MAT4) {
-          float[] v = ((float[])val.value);
-          updateFloatBuffer(v);
-          pgl.uniformMatrix4fv(loc, 1, false, floatBuffer);
-        } else if (val.type == UniformValue.SAMPLER2D) {
-          PImage img = (PImage)val.value;
-          Texture tex = currentPG.getTexture(img);
-
-          if (textures == null) textures = new HashMap<Integer, Texture>();
-          textures.put(loc, tex);
-
-          if (texUnits == null) texUnits = new HashMap<Integer, Integer>();
-          if (texUnits.containsKey(loc)) {
-            unit = texUnits.get(loc);
-            pgl.uniform1i(loc, unit);
-          } else {
-            texUnits.put(loc, unit);
-            pgl.uniform1i(loc, unit);
+          switch (val.type) {
+              case UniformValue.INT1:
+                  {
+                      int[] v = ((int[])val.value);
+                      pgl.uniform1i(loc, v[0]);
+                      break;
+                  }
+              case UniformValue.INT2:
+                  {
+                      int[] v = ((int[])val.value);
+                      pgl.uniform2i(loc, v[0], v[1]);
+                      break;
+                  }
+              case UniformValue.INT3:
+                  {
+                      int[] v = ((int[])val.value);
+                      pgl.uniform3i(loc, v[0], v[1], v[2]);
+                      break;
+                  }
+              case UniformValue.INT4:
+                  {
+                      int[] v = ((int[])val.value);
+                      pgl.uniform4i(loc, v[0], v[1], v[2], v[3]);
+                      break;
+                  }
+              case UniformValue.FLOAT1:
+                  {
+                      float[] v = ((float[])val.value);
+                      pgl.uniform1f(loc, v[0]);
+                      break;
+                  }
+              case UniformValue.FLOAT2:
+                  {
+                      float[] v = ((float[])val.value);
+                      pgl.uniform2f(loc, v[0], v[1]);
+                      break;
+                  }
+              case UniformValue.FLOAT3:
+                  {
+                      float[] v = ((float[])val.value);
+                      pgl.uniform3f(loc, v[0], v[1], v[2]);
+                      break;
+                  }
+              case UniformValue.FLOAT4:
+                  {
+                      float[] v = ((float[])val.value);
+                      pgl.uniform4f(loc, v[0], v[1], v[2], v[3]);
+                      break;
+                  }
+              case UniformValue.INT1VEC:
+                  {
+                      int[] v = ((int[])val.value);
+                      updateIntBuffer(v);
+                      pgl.uniform1iv(loc, v.length, intBuffer);
+                      break;
+                  }
+              case UniformValue.INT2VEC:
+                  {
+                      int[] v = ((int[])val.value);
+                      updateIntBuffer(v);
+                      pgl.uniform2iv(loc, v.length / 2, intBuffer);
+                      break;
+                  }
+              case UniformValue.INT3VEC:
+                  {
+                      int[] v = ((int[])val.value);
+                      updateIntBuffer(v);
+                      pgl.uniform3iv(loc, v.length / 3, intBuffer);
+                      break;
+                  }
+              case UniformValue.INT4VEC:
+                  {
+                      int[] v = ((int[])val.value);
+                      updateIntBuffer(v);
+                      pgl.uniform4iv(loc, v.length / 4, intBuffer);
+                      break;
+                  }
+              case UniformValue.FLOAT1VEC:
+                  {
+                      float[] v = ((float[])val.value);
+                      updateFloatBuffer(v);
+                      pgl.uniform1fv(loc, v.length, floatBuffer);
+                      break;
+                  }
+              case UniformValue.FLOAT2VEC:
+                  {
+                      float[] v = ((float[])val.value);
+                      updateFloatBuffer(v);
+                      pgl.uniform2fv(loc, v.length / 2, floatBuffer);
+                      break;
+                  }
+              case UniformValue.FLOAT3VEC:
+                  {
+                      float[] v = ((float[])val.value);
+                      updateFloatBuffer(v);
+                      pgl.uniform3fv(loc, v.length / 3, floatBuffer);
+                      break;
+                  }
+              case UniformValue.FLOAT4VEC:
+                  {
+                      float[] v = ((float[])val.value);
+                      updateFloatBuffer(v);
+                      pgl.uniform4fv(loc, v.length / 4, floatBuffer);
+                      break;
+                  }
+              case UniformValue.MAT2:
+                  {
+                      float[] v = ((float[])val.value);
+                      updateFloatBuffer(v);
+                      pgl.uniformMatrix2fv(loc, 1, false, floatBuffer);
+                      break;
+                  }
+              case UniformValue.MAT3:
+                  {
+                      float[] v = ((float[])val.value);
+                      updateFloatBuffer(v);
+                      pgl.uniformMatrix3fv(loc, 1, false, floatBuffer);
+                      break;
+                  }
+              case UniformValue.MAT4:
+                  {
+                      float[] v = ((float[])val.value);
+                      updateFloatBuffer(v);
+                      pgl.uniformMatrix4fv(loc, 1, false, floatBuffer);
+                      break;
+                  }
+              case UniformValue.SAMPLER2D:
+                  PImage img = (PImage)val.value;
+                  Texture tex = currentPG.getTexture(img);
+                  if (textures == null) textures = new HashMap<>();
+                  textures.put(loc, tex);
+                  if (texUnits == null) texUnits = new HashMap<>();
+                  if (texUnits.containsKey(loc)) {
+                      unit = texUnits.get(loc);
+                      pgl.uniform1i(loc, unit);
+                  } else {
+                      texUnits.put(loc, unit);
+                      pgl.uniform1i(loc, unit);
+                  }       unit++;
+                  break;
+              default:
+                  break;
           }
-          unit++;
-        }
       }
       uniformValues.clear();
     }
@@ -857,32 +929,32 @@ public class PShader implements PConstants {
 
   protected void bindTextures() {
     if (textures != null && texUnits != null) {
-      for (int loc: textures.keySet()) {
-        Texture tex = textures.get(loc);
-        Integer unit = texUnits.get(loc);
-        if (unit != null) {
-          pgl.activeTexture(PGL.TEXTURE0 + unit);
-          tex.bind();
-        } else {
-          throw new RuntimeException("Cannot find unit for texture " + tex);
-        }
-      }
+        textures.keySet().forEach((loc) -> {
+            Texture tex = textures.get(loc);
+            Integer unit = texUnits.get(loc);
+            if (unit != null) {
+                pgl.activeTexture(PGL.TEXTURE0 + unit);
+                tex.bind();
+            } else {
+                throw new RuntimeException("Cannot find unit for texture " + tex);
+            }
+        });
     }
   }
 
 
   protected void unbindTextures() {
     if (textures != null && texUnits != null) {
-      for (int loc: textures.keySet()) {
-        Texture tex = textures.get(loc);
-        Integer unit = texUnits.get(loc);
-        if (unit != null) {
-          pgl.activeTexture(PGL.TEXTURE0 + unit);
-          tex.unbind();
-        } else {
-          throw new RuntimeException("Cannot find unit for texture " + tex);
-        }
-      }
+        textures.keySet().forEach((loc) -> {
+            Texture tex = textures.get(loc);
+            Integer unit = texUnits.get(loc);
+            if (unit != null) {
+                pgl.activeTexture(PGL.TEXTURE0 + unit);
+                tex.unbind();
+            } else {
+                throw new RuntimeException("Cannot find unit for texture " + tex);
+            }
+        });
       pgl.activeTexture(PGL.TEXTURE0);
     }
   }
@@ -932,7 +1004,7 @@ public class PShader implements PConstants {
 
   protected void validate() {
     pgl.getProgramiv(glProgram, PGL.LINK_STATUS, intBuffer);
-    boolean linked = intBuffer.get(0) == 0 ? false : true;
+    boolean linked = intBuffer.get(0) != 0;
     if (!linked) {
       PGraphics.showException("Cannot link shader program:\n" +
                               pgl.getProgramInfoLog(glProgram));
@@ -940,7 +1012,7 @@ public class PShader implements PConstants {
 
     pgl.validateProgram(glProgram);
     pgl.getProgramiv(glProgram, PGL.VALIDATE_STATUS, intBuffer);
-    boolean validated = intBuffer.get(0) == 0 ? false : true;
+    boolean validated = intBuffer.get(0) != 0;
     if (!validated) {
       PGraphics.showException("Cannot validate shader program:\n" +
                               pgl.getProgramInfoLog(glProgram));
@@ -976,7 +1048,7 @@ public class PShader implements PConstants {
     pgl.compileShader(glVertex);
 
     pgl.getShaderiv(glVertex, PGL.COMPILE_STATUS, intBuffer);
-    boolean compiled = intBuffer.get(0) == 0 ? false : true;
+    boolean compiled = intBuffer.get(0) != 0;
     if (!compiled) {
       PGraphics.showException("Cannot compile vertex shader:\n" +
                               pgl.getShaderInfoLog(glVertex));
@@ -995,7 +1067,7 @@ public class PShader implements PConstants {
     pgl.compileShader(glFragment);
 
     pgl.getShaderiv(glFragment, PGL.COMPILE_STATUS, intBuffer);
-    boolean compiled = intBuffer.get(0) == 0 ? false : true;
+    boolean compiled = intBuffer.get(0) != 0;
     if (!compiled) {
       PGraphics.showException("Cannot compile fragment shader:\n" +
                               pgl.getShaderInfoLog(glFragment));
@@ -1018,36 +1090,35 @@ public class PShader implements PConstants {
 
 
   static protected int getShaderType(String[] source, int defaultType) {
-    for (int i = 0; i < source.length; i++) {
-      String line = source[i].trim();
-
-      if (PApplet.match(line, colorShaderDefRegexp) != null)
-        return PShader.COLOR;
-      else if (PApplet.match(line, lightShaderDefRegexp) != null)
-        return PShader.LIGHT;
-      else if (PApplet.match(line, texShaderDefRegexp) != null)
-        return PShader.TEXTURE;
-      else if (PApplet.match(line, texlightShaderDefRegexp) != null)
-        return PShader.TEXLIGHT;
-      else if (PApplet.match(line, polyShaderDefRegexp) != null)
-        return PShader.POLY;
-      else if (PApplet.match(line, triShaderAttrRegexp) != null)
-        return PShader.POLY;
-      else if (PApplet.match(line, quadShaderAttrRegexp) != null)
-        return PShader.POLY;
-      else if (PApplet.match(line, pointShaderDefRegexp) != null)
-        return PShader.POINT;
-      else if (PApplet.match(line, lineShaderDefRegexp) != null)
-        return PShader.LINE;
-      else if (PApplet.match(line, pointShaderAttrRegexp) != null)
-        return PShader.POINT;
-      else if (PApplet.match(line, pointShaderInRegexp) != null)
-        return PShader.POINT;
-      else if (PApplet.match(line, lineShaderAttrRegexp) != null)
-        return PShader.LINE;
-      else if (PApplet.match(line, lineShaderInRegexp) != null)
-        return PShader.LINE;
-    }
+      for (String source1 : source) {
+          String line = source1.trim();
+          if (PApplet.match(line, colorShaderDefRegexp) != null)
+              return PShader.COLOR;
+          else if (PApplet.match(line, lightShaderDefRegexp) != null)
+              return PShader.LIGHT;
+          else if (PApplet.match(line, texShaderDefRegexp) != null)
+              return PShader.TEXTURE;
+          else if (PApplet.match(line, texlightShaderDefRegexp) != null)
+              return PShader.TEXLIGHT;
+          else if (PApplet.match(line, polyShaderDefRegexp) != null)
+              return PShader.POLY;
+          else if (PApplet.match(line, triShaderAttrRegexp) != null)
+              return PShader.POLY;
+          else if (PApplet.match(line, quadShaderAttrRegexp) != null)
+              return PShader.POLY;
+          else if (PApplet.match(line, pointShaderDefRegexp) != null)
+              return PShader.POINT;
+          else if (PApplet.match(line, lineShaderDefRegexp) != null)
+              return PShader.LINE;
+          else if (PApplet.match(line, pointShaderAttrRegexp) != null)
+              return PShader.POINT;
+          else if (PApplet.match(line, pointShaderInRegexp) != null)
+              return PShader.POINT;
+          else if (PApplet.match(line, lineShaderAttrRegexp) != null)
+              return PShader.LINE;
+          else if (PApplet.match(line, lineShaderInRegexp) != null)
+              return PShader.LINE;
+      }
     return defaultType;
   }
 
@@ -1091,15 +1162,22 @@ public class PShader implements PConstants {
     if (getType() == PShader.POLY) return true;
 
     if (getType() != type) {
-      if (type == TEXLIGHT) {
-        PGraphics.showWarning(PGraphicsOpenGL.NO_TEXLIGHT_SHADER_ERROR);
-      } else if (type == LIGHT) {
-        PGraphics.showWarning(PGraphicsOpenGL.NO_LIGHT_SHADER_ERROR);
-      } else if (type == TEXTURE) {
-        PGraphics.showWarning(PGraphicsOpenGL.NO_TEXTURE_SHADER_ERROR);
-      } else if (type == COLOR) {
-        PGraphics.showWarning(PGraphicsOpenGL.NO_COLOR_SHADER_ERROR);
-      }
+        switch (type) {
+            case TEXLIGHT:
+                PGraphics.showWarning(PGraphicsOpenGL.NO_TEXLIGHT_SHADER_ERROR);
+                break;
+            case LIGHT:
+                PGraphics.showWarning(PGraphicsOpenGL.NO_LIGHT_SHADER_ERROR);
+                break;
+            case TEXTURE:
+                PGraphics.showWarning(PGraphicsOpenGL.NO_TEXTURE_SHADER_ERROR);
+                break;
+            case COLOR:
+                PGraphics.showWarning(PGraphicsOpenGL.NO_COLOR_SHADER_ERROR);
+                break;
+            default:
+                break;
+        }
       return false;
     }
 

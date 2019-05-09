@@ -181,46 +181,47 @@ public class PSurfaceJOGL implements PSurface {
   protected void initGL() {
 //  System.out.println("*******************************");
     if (profile == null) {
-      if (PJOGL.profile == 1) {
-        try {
-          profile = GLProfile.getGL2ES1();
-        } catch (GLException ex) {
-          profile = GLProfile.getMaxFixedFunc(true);
+        switch (PJOGL.profile) {
+            case 1:
+                try {
+                    profile = GLProfile.getGL2ES1();
+                } catch (GLException ex) {
+                    profile = GLProfile.getMaxFixedFunc(true);
+                }       break;
+            case 2:
+                try {
+                    profile = GLProfile.getGL2ES2();
+                    
+                    // workaround for https://jogamp.org/bugzilla/show_bug.cgi?id=1347
+                    if (!profile.isHardwareRasterizer()) {
+                        GLProfile hardware = GLProfile.getMaxProgrammable(true);
+                        if (hardware.isGL2ES2()) {
+                            profile = hardware;
+                        }
+                    }
+                    
+                } catch (GLException ex) {
+                    profile = GLProfile.getMaxProgrammable(true);
+                }       break;
+            case 3:
+                try {
+                    profile = GLProfile.getGL2GL3();
+                } catch (GLException ex) {
+                    profile = GLProfile.getMaxProgrammable(true);
+                }       if (!profile.isGL3()) {
+                    PGraphics.showWarning("Requested profile GL3 but is not available, got: " + profile);
+                }       break;
+            case 4:
+                try {
+                    profile = GLProfile.getGL4ES3();
+                } catch (GLException ex) {
+                    profile = GLProfile.getMaxProgrammable(true);
+                }       if (!profile.isGL4()) {
+                    PGraphics.showWarning("Requested profile GL4 but is not available, got: " + profile);
+                }       break;
+            default:
+                throw new RuntimeException(PGL.UNSUPPORTED_GLPROF_ERROR);
         }
-      } else if (PJOGL.profile == 2) {
-        try {
-          profile = GLProfile.getGL2ES2();
-
-          // workaround for https://jogamp.org/bugzilla/show_bug.cgi?id=1347
-          if (!profile.isHardwareRasterizer()) {
-            GLProfile hardware = GLProfile.getMaxProgrammable(true);
-            if (hardware.isGL2ES2()) {
-              profile = hardware;
-            }
-          }
-
-        } catch (GLException ex) {
-          profile = GLProfile.getMaxProgrammable(true);
-        }
-      } else if (PJOGL.profile == 3) {
-        try {
-          profile = GLProfile.getGL2GL3();
-        } catch (GLException ex) {
-          profile = GLProfile.getMaxProgrammable(true);
-        }
-        if (!profile.isGL3()) {
-          PGraphics.showWarning("Requested profile GL3 but is not available, got: " + profile);
-        }
-      } else if (PJOGL.profile == 4) {
-        try {
-          profile = GLProfile.getGL4ES3();
-        } catch (GLException ex) {
-          profile = GLProfile.getMaxProgrammable(true);
-        }
-        if (!profile.isGL4()) {
-          PGraphics.showWarning("Requested profile GL4 but is not available, got: " + profile);
-        }
-      } else throw new RuntimeException(PGL.UNSUPPORTED_GLPROF_ERROR);
     }
 
     // Setting up the desired capabilities;
@@ -377,46 +378,38 @@ public class PSurfaceJOGL implements PSurface {
 
     animator = new FPSAnimator(window, 60);
     drawException = null;
-    animator.setUncaughtExceptionHandler(new GLAnimatorControl.UncaughtExceptionHandler() {
-      @Override
-      public void uncaughtException(final GLAnimatorControl animator,
-                                    final GLAutoDrawable drawable,
-                                    final Throwable cause) {
+    animator.setUncaughtExceptionHandler((final GLAnimatorControl animator1, final GLAutoDrawable drawable, final Throwable cause) -> {
         synchronized (drawExceptionMutex) {
-          drawException = cause;
-          drawExceptionMutex.notify();
+            drawException = cause;
+            drawExceptionMutex.notify();
         }
-      }
     });
 
-    drawExceptionHandler = new Thread(new Runnable() {
-      public void run() {
+    drawExceptionHandler = new Thread(() -> {
         synchronized (drawExceptionMutex) {
-          try {
-            while (drawException == null) {
-              drawExceptionMutex.wait();
+            try {
+                while (drawException == null) {
+                    drawExceptionMutex.wait();
+                }
+                // System.err.println("Caught exception: " + drawException.getMessage());
+                if (drawException != null) {
+                    Throwable cause = drawException.getCause();
+                    if (cause instanceof ThreadDeath) {
+                        // System.out.println("caught ThreadDeath");
+                        // throw (ThreadDeath)cause;
+                    } else if (cause instanceof RuntimeException) {
+                        throw (RuntimeException) cause;
+                    } else if (cause instanceof UnsatisfiedLinkError) {
+                        throw new UnsatisfiedLinkError(cause.getMessage());
+                    } else if (cause == null) {
+                        throw new RuntimeException(drawException.getMessage());
+                    } else {
+                        throw new RuntimeException(cause);
+                    }
+                }
+            } catch (InterruptedException e) {
             }
-            // System.err.println("Caught exception: " + drawException.getMessage());
-            if (drawException != null) {
-              Throwable cause = drawException.getCause();
-              if (cause instanceof ThreadDeath) {
-                // System.out.println("caught ThreadDeath");
-                // throw (ThreadDeath)cause;
-              } else if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-              } else if (cause instanceof UnsatisfiedLinkError) {
-                throw new UnsatisfiedLinkError(cause.getMessage());
-              } else if (cause == null) {
-                throw new RuntimeException(drawException.getMessage());
-              } else {
-                throw new RuntimeException(cause);
-              }
-            }
-          } catch (InterruptedException e) {
-            return;
-          }
         }
-      }
     });
     drawExceptionHandler.start();
   }
@@ -424,33 +417,24 @@ public class PSurfaceJOGL implements PSurface {
 
   @Override
   public void setTitle(final String title) {
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.setTitle(title);
-      }
     });
   }
 
 
   @Override
   public void setVisible(final boolean visible) {
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.setVisible(visible);
-      }
     });
   }
 
 
   @Override
   public void setResizable(final boolean resizable) {
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.setResizable(resizable);
-      }
     });
   }
 
@@ -463,11 +447,8 @@ public class PSurfaceJOGL implements PSurface {
 
   @Override
   public void setAlwaysOnTop(final boolean always) {
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.setAlwaysOnTop(always);
-      }
     });
   }
 
@@ -540,8 +521,8 @@ public class PSurfaceJOGL implements PSurface {
 
       // have to break these out because a general Exception might
       // catch the RuntimeException being thrown above
-    } catch (IOException ioe) {
-    } catch (SecurityException se) { }
+    } catch (IOException | SecurityException ioe) {
+    }
 
     ClassLoader cl = sketch.getClass().getClassLoader();
 
@@ -594,7 +575,7 @@ public class PSurfaceJOGL implements PSurface {
             stream.close();
             return path;
           }
-        } catch (Exception e) { }  // ignored
+        } catch (IOException e) { }  // ignored
 
         try {
           stream = new FileInputStream(filename);
@@ -607,8 +588,8 @@ public class PSurfaceJOGL implements PSurface {
       } catch (SecurityException se) { }  // online, whups
 
     } catch (Exception e) {
-      //die(e.getMessage(), e);
-      e.printStackTrace();
+        //die(e.getMessage(), e);
+
     }
 
     return "";
@@ -675,6 +656,7 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public void placePresent(int stopColor) {
     float scale = getPixelScale();
     pgl.initPresentMode(0.5f * (screenRect.width/scale - sketchWidth),
@@ -687,11 +669,13 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public void setupExternalMessages() {
     external = true;
   }
 
 
+  @Override
   public void startThread() {
     if (animator != null) {
       animator.start();
@@ -699,6 +683,7 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public void pauseThread() {
     if (animator != null) {
       animator.pause();
@@ -706,6 +691,7 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public void resumeThread() {
     if (animator != null) {
       animator.resume();
@@ -713,6 +699,7 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public boolean stopThread() {
     if (drawExceptionHandler != null) {
       drawExceptionHandler.interrupt();
@@ -726,6 +713,7 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public boolean isStopped() {
     if (animator != null) {
       return !animator.isAnimating();
@@ -735,16 +723,15 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public void setLocation(final int x, final int y) {
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.setTopLevelPosition(x, y);
-      }
     });
   }
 
 
+  @Override
   public void setSize(int wide, int high) {
     if (pgl.presentMode()) return;
 
@@ -813,6 +800,7 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public void setFrameRate(float fps) {
     if (fps < 1) {
       PGraphics.showWarning(
@@ -835,16 +823,14 @@ public class PSurfaceJOGL implements PSurface {
 
 
   public void requestFocus() {
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.requestFocus();
-      }
     });
   }
 
 
   class DrawListener implements GLEventListener {
+    @Override
     public void display(GLAutoDrawable drawable) {
       if (display.getEDTUtil().isCurrentThreadEDT()) {
         // For some reason, the first two frames of the animator are run on the
@@ -881,9 +867,11 @@ public class PSurfaceJOGL implements PSurface {
         sketch.exitActual();
       }
     }
+    @Override
     public void dispose(GLAutoDrawable drawable) {
 //      sketch.dispose();
     }
+    @Override
     public void init(GLAutoDrawable drawable) {
       pgl.getGL(drawable);
       pgl.init(drawable);
@@ -892,11 +880,12 @@ public class PSurfaceJOGL implements PSurface {
       int c = graphics.backgroundColor;
       pgl.clearColor(((c >> 16) & 0xff) / 255f,
                      ((c >>  8) & 0xff) / 255f,
-                     ((c >>  0) & 0xff) / 255f,
+                     ((c) & 0xff) / 255f,
                      ((c >> 24) & 0xff) / 255f);
       pgl.clear(PGL.COLOR_BUFFER_BIT);
     }
 
+    @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int w, int h) {
       pgl.resetFBOLayer();
       pgl.getGL(drawable);
@@ -1231,6 +1220,7 @@ public class PSurfaceJOGL implements PSurface {
   }
 
 
+  @Override
   public void setCursor(int kind) {
     if (!cursorNames.containsKey(kind)) {
       PGraphics.showWarning("Unknown cursor type: " + kind);
@@ -1246,14 +1236,23 @@ public class PSurfaceJOGL implements PSurface {
         // Most cursors just use the center as the hotspot...
         int x = img.width / 2;
         int y = img.height / 2;
-        // ...others are more specific
-        if (kind == PConstants.ARROW) {
-          x = 10; y = 7;
-        } else if (kind == PConstants.HAND) {
-          x = 12; y = 8;
-        } else if (kind == PConstants.TEXT) {
-          x = 16; y = 22;
-        }
+          // ...others are more specific
+          switch (kind) {
+              case PConstants.ARROW:
+                  x = 10;
+                  y = 7;
+                  break;
+              case PConstants.HAND:
+                  x = 12;
+                  y = 8;
+                  break;
+              case PConstants.TEXT:
+                  x = 16;
+                  y = 22;
+                  break;
+              default:
+                  break;
+          }
         cursor = new CursorInfo(img, x, y);
         cursors.put(kind, cursor);
       }
@@ -1277,32 +1276,23 @@ public class PSurfaceJOGL implements PSurface {
     final Dimension size = new Dimension(bimg.getWidth(), bimg.getHeight());
     PixelRectangle pixelrect = new PixelRectangle.GenericPixelRect(format, size, 0, false, pixels);
     final PointerIcon pi = disp.createPointerIcon(pixelrect, hotspotX, hotspotY);
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.setPointerVisible(true);
         window.setPointerIcon(pi);
-      }
     });
   }
 
 
   public void showCursor() {
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.setPointerVisible(true);
-      }
     });
   }
 
 
   public void hideCursor() {
-    display.getEDTUtil().invoke(false, new Runnable() {
-      @Override
-      public void run() {
+    display.getEDTUtil().invoke(false, () -> {
         window.setPointerVisible(false);
-      }
     });
   }
 }

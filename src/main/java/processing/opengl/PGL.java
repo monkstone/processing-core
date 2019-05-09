@@ -799,13 +799,13 @@ public abstract class PGL {
             float ba = ((stopButtonColor >> 24) & 0xFF) / 255f;
             float br = ((stopButtonColor >> 16) & 0xFF) / 255f;
             float bg = ((stopButtonColor >>  8) & 0xFF) / 255f;
-            float bb = ((stopButtonColor >>  0) & 0xFF) / 255f;
+            float bb = ((stopButtonColor) & 0xFF) / 255f;
             for (int i = 0; i < color.length; i++) {
               int c = closeButtonPix[i];
               int a = (int)(ba * ((c >> 24) & 0xFF));
               int r = (int)(br * ((c >> 16) & 0xFF));
               int g = (int)(bg * ((c >>  8) & 0xFF));
-              int b = (int)(bb * ((c >>  0) & 0xFF));
+              int b = (int)(bb * ((c) & 0xFF));
               color[i] = javaToNativeARGB((a << 24) | (r << 16) | (g << 8) | b);
             }
             IntBuffer buf = allocateIntBuffer(color);
@@ -1075,13 +1075,19 @@ public abstract class PGL {
       // separate depth and stencil buffers
       if (0 < depthBits) {
         int depthComponent = DEPTH_COMPONENT16;
-        if (depthBits == 32) {
-          depthComponent = DEPTH_COMPONENT32;
-        } else if (depthBits == 24) {
-          depthComponent = DEPTH_COMPONENT24;
-        } else if (depthBits == 16) {
-          depthComponent = DEPTH_COMPONENT16;
-        }
+          switch (depthBits) {
+              case 32:
+                  depthComponent = DEPTH_COMPONENT32;
+                  break;
+              case 24:
+                  depthComponent = DEPTH_COMPONENT24;
+                  break;
+              case 16:
+                  depthComponent = DEPTH_COMPONENT16;
+                  break;
+              default:
+                  break;
+          }
 
         IntBuffer depthBuf = multisample ? glMultiDepth : glDepth;
         genRenderbuffers(1, depthBuf);
@@ -1099,13 +1105,19 @@ public abstract class PGL {
 
       if (0 < stencilBits) {
         int stencilIndex = STENCIL_INDEX1;
-        if (stencilBits == 8) {
-          stencilIndex = STENCIL_INDEX8;
-        } else if (stencilBits == 4) {
-          stencilIndex = STENCIL_INDEX4;
-        } else if (stencilBits == 1) {
-          stencilIndex = STENCIL_INDEX1;
-        }
+          switch (stencilBits) {
+              case 8:
+                  stencilIndex = STENCIL_INDEX8;
+                  break;
+              case 4:
+                  stencilIndex = STENCIL_INDEX4;
+                  break;
+              case 1:
+                  stencilIndex = STENCIL_INDEX1;
+                  break;
+              default:
+                  break;
+          }
 
         IntBuffer stencilBuf = multisample ? glMultiStencil : glStencil;
         genRenderbuffers(1, stencilBuf);
@@ -2009,16 +2021,15 @@ public abstract class PGL {
   }
 
   protected static boolean containsVersionDirective(String[] shSrc) {
-    for (int i = 0; i < shSrc.length; i++) {
-      String line = shSrc[i];
-      int versionIndex = line.indexOf("#version");
-      if (versionIndex >= 0) {
-        int commentIndex = line.indexOf("//");
-        if (commentIndex < 0 || versionIndex < commentIndex) {
-          return true;
-        }
+      for (String line : shSrc) {
+          int versionIndex = line.indexOf("#version");
+          if (versionIndex >= 0) {
+              int commentIndex = line.indexOf("//");
+              if (commentIndex < 0 || versionIndex < commentIndex) {
+                  return true;
+              }
+          }
       }
-    }
     return false;
   }
 

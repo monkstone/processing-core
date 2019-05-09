@@ -78,9 +78,9 @@ class FontTexture implements PConstants {
 
 
   protected void dispose() {
-    for (int i = 0; i < textures.length; i++) {
-      textures[i].dispose();
-    }
+      for (Texture texture : textures) {
+          texture.dispose();
+      }
   }
 
 
@@ -104,7 +104,7 @@ class FontTexture implements PConstants {
     offsetY = 0;
     lineHeight = 0;
 
-    texinfoMap = new HashMap<PFont.Glyph, TextureInfo>();
+    texinfoMap = new HashMap<>();
     glyphTexinfos = new TextureInfo[font.getGlyphCount()];
     addAllGlyphsToTexture(pg, font);
   }
@@ -183,9 +183,9 @@ class FontTexture implements PConstants {
 
 
   public void end() {
-    for (int i = 0; i < textures.length; i++) {
-      pgl.disableTexturing(textures[i].glTarget);
-    }
+      for (Texture texture : textures) {
+          pgl.disableTexturing(texture.glTarget);
+      }
   }
 
 
@@ -204,13 +204,12 @@ class FontTexture implements PConstants {
 
 
   public void updateGlyphsTexCoords() {
-    // loop over current glyphs.
-    for (int i = 0; i < glyphTexinfos.length; i++) {
-      TextureInfo tinfo = glyphTexinfos[i];
-      if (tinfo != null && tinfo.texIndex == lastTex) {
-        tinfo.updateUV();
+      // loop over current glyphs.
+      for (TextureInfo tinfo : glyphTexinfos) {
+          if (tinfo != null && tinfo.texIndex == lastTex) {
+              tinfo.updateUV();
+          }
       }
-    }
   }
 
 
@@ -232,15 +231,15 @@ class FontTexture implements PConstants {
 
   public boolean contextIsOutdated() {
     boolean outdated = false;
-    for (int i = 0; i < textures.length; i++) {
-      if (textures[i].contextIsOutdated())  {
-        outdated = true;
+      for (Texture texture : textures) {
+          if (texture.contextIsOutdated()) {
+              outdated = true;
+          }
       }
-    }
     if (outdated) {
-      for (int i = 0; i < textures.length; i++) {
-        textures[i].dispose();
-      }
+        for (Texture texture : textures) {
+            texture.dispose();
+        }
     }
     return outdated;
   }

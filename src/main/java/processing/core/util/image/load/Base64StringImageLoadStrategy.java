@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,8 +20,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.load;
 
 import processing.core.PApplet;
@@ -33,7 +32,6 @@ import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.util.Base64;
 
-
 /**
  * Strategy for loading images from Base64 strings.
  */
@@ -43,7 +41,7 @@ public class Base64StringImageLoadStrategy implements ImageLoadStrategy {
   public PImage load(PApplet pApplet, String content, String extension) {
     byte[] decodedBytes = Base64.getDecoder().decode(content);
 
-    if(decodedBytes == null){
+    if (decodedBytes == null) {
       System.err.println("Decode Error on image: " + content.substring(0, 20));
       return null;
     }
@@ -59,8 +57,8 @@ public class Base64StringImageLoadStrategy implements ImageLoadStrategy {
     }
 
     PImage loadedImage = new PImage(
-        awtImage,
-        ImageLoadUtil.checkExtensionRequiresAlpha(extension)
+      awtImage,
+      ImageLoadUtil.checkExtensionRequiresAlpha(extension)
     );
 
     if (loadedImage.width == -1) {

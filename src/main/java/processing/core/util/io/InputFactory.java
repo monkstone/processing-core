@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,8 +20,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.io;
 
 import processing.core.PApplet;
@@ -29,7 +28,6 @@ import processing.core.PApplet;
 import java.io.*;
 import java.net.*;
 import java.util.zip.GZIPInputStream;
-
 
 /**
  * Factory producing InputStreams under various parameter sets.
@@ -69,14 +67,16 @@ public class InputFactory {
    * Create an InputStream using path information from a PApplet.
    *
    * <p>
-   * Create an InputStream using path information from a PApplet with some pre-processing of file
-   * contents like unzipping a gzip compressed file. This is in contrast to createInputRaw which
-   * will not perform any pre-processing.
+   * Create an InputStream using path information from a PApplet with some
+   * pre-processing of file contents like unzipping a gzip compressed file. This
+   * is in contrast to createInputRaw which will not perform any pre-processing.
    * </p>
    *
    * @param pApplet The PApplet whose sketch path informatino should be used.
-   * @param filename THe filename (url, absolute path, or relative path) to open.
-   * @return InputStream for the given filename or null if no input path could be created.
+   * @param filename THe filename (url, absolute path, or relative path) to
+   * open.
+   * @return InputStream for the given filename or null if no input path could
+   * be created.
    */
   public static InputStream createInput(PApplet pApplet, String filename) {
     InputStream input = createInputRaw(pApplet, filename);
@@ -98,20 +98,25 @@ public class InputFactory {
   }
 
   /**
-   * Create an InputStream without any pre-processing of file content before it is returned.
+   * Create an InputStream without any pre-processing of file content before it
+   * is returned.
    *
    * <p>
-   * Create an InputStream using path information from a PApplet without any pre-processing of file
-   * contents like unzipping a gzip compressed file. This is in contrast to createInput which will
-   * perform some pre-processing.
+   * Create an InputStream using path information from a PApplet without any
+   * pre-processing of file contents like unzipping a gzip compressed file. This
+   * is in contrast to createInput which will perform some pre-processing.
    * </p>
    *
    * @param pApplet The PApplet whose sketch path information should be used.
-   * @param filename THe filename (url, absolute path, or relative path) to open.
-   * @return InputStream for the given filename or null if no input path could be created.
+   * @param filename THe filename (url, absolute path, or relative path) to
+   * open.
+   * @return InputStream for the given filename or null if no input path could
+   * be created.
    */
   public static InputStream createInputRaw(PApplet pApplet, String filename) {
-    if (filename == null) return null;
+    if (filename == null) {
+      return null;
+    }
 
     String sketchPath = pApplet.sketchPath();
 
@@ -193,12 +198,13 @@ public class InputFactory {
           //if (filenameActual.equalsIgnoreCase(filenameShort) &&
           //!filenameActual.equals(filenameShort)) {
           if (!filenameActual.equals(filenameShort)) {
-            throw new RuntimeException("This file is named " +
-                filenameActual + " not " +
-                filename + ". Rename the file " +
-                "or change your code.");
+            throw new RuntimeException("This file is named "
+              + filenameActual + " not "
+              + filename + ". Rename the file "
+              + "or change your code.");
           }
-        } catch (IOException e) { }
+        } catch (IOException e) {
+        }
       }
 
       // if this file is ok, may as well just load it
@@ -210,7 +216,8 @@ public class InputFactory {
       // have to break these out because a general Exception might
       // catch the RuntimeException being thrown above
     } catch (IOException ioe) {
-    } catch (SecurityException se) { }
+    } catch (SecurityException se) {
+    }
 
     // Using getClassLoader() prevents java from converting dots
     // to slashes or requiring a slash at the beginning.
@@ -249,20 +256,30 @@ public class InputFactory {
       try {  // first try to catch any security exceptions
         try {
           stream = new FileInputStream(pApplet.dataPath(filename));
-          if (stream != null) return stream;
-        } catch (IOException e2) { }
+          if (stream != null) {
+            return stream;
+          }
+        } catch (IOException e2) {
+        }
 
         try {
           stream = new FileInputStream(pApplet.sketchPath(filename));
-          if (stream != null) return stream;
-        } catch (Exception e) { }  // ignored
+          if (stream != null) {
+            return stream;
+          }
+        } catch (Exception e) {
+        }  // ignored
 
         try {
           stream = new FileInputStream(filename);
-          if (stream != null) return stream;
-        } catch (IOException e1) { }
+          if (stream != null) {
+            return stream;
+          }
+        } catch (IOException e1) {
+        }
 
-      } catch (SecurityException se) { }  // online, whups
+      } catch (SecurityException se) {
+      }  // online, whups
 
     } catch (Exception e) {
       e.printStackTrace();

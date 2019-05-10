@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,10 +20,8 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.load;
-
 
 /**
  * Convenience functions for use while loading images.
@@ -37,9 +35,9 @@ public class ImageLoadUtil {
    * @return True if one needs to look for alpha channel and false otherwise.
    */
   public static boolean checkExtensionRequiresAlpha(String extension) {
-    return extension.equals("gif") ||
-        extension.equals("png") ||
-        extension.equals("unknown");
+    return extension.equals("gif")
+      || extension.equals("png")
+      || extension.equals("unknown");
   }
 
 }

@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,16 +20,15 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.load;
 
 import processing.core.PApplet;
 import processing.core.PImage;
 
-
 /**
- * Interface for strategies to load different image formats and through different methods.
+ * Interface for strategies to load different image formats and through
+ * different methods.
  */
 public interface ImageLoadStrategy {
 
@@ -37,9 +36,9 @@ public interface ImageLoadStrategy {
    * Load an image.
    *
    * @param pApplet The PApplet on whose behalf an image is being loaded.
-   * @param path The path to the file like "subdirectory/file.png". Note that paths without
-   *    extensions are supported and the extension is not read off this path but instead must be
-   *    specified in the extension parameter.
+   * @param path The path to the file like "subdirectory/file.png". Note that
+   * paths without extensions are supported and the extension is not read off
+   * this path but instead must be specified in the extension parameter.
    * @param extension The extension of the file to open.
    * @return The PImage loaded from the given path.
    */

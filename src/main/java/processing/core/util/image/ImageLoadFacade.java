@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,8 +20,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image;
 
 import processing.core.PApplet;
@@ -33,9 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-
 /**
- * Utility for loading images either from file system or string encoding using a set of strategies.
+ * Utility for loading images either from file system or string encoding using a
+ * set of strategies.
  */
 public class ImageLoadFacade {
 
@@ -75,8 +74,8 @@ public class ImageLoadFacade {
     defaultImageLoadStrategy = new ImageIoImageLoadStrategy();
 
     ImageLoadStrategy awtFallbackStrategy = new FallbackImageLoadStrategy(
-        awtImageLoadStrategy,
-        defaultImageLoadStrategy
+      awtImageLoadStrategy,
+      defaultImageLoadStrategy
     );
     loadStrategies.put("jpg", awtFallbackStrategy);
     loadStrategies.put("jpeg", awtFallbackStrategy);
@@ -88,9 +87,11 @@ public class ImageLoadFacade {
   /**
    * Load an image embedded within an SVG string.
    *
-   * @param pApplet The PApplet on whose behalf an SVG is being parsed. This must be given so that
-   *                image can be retrieved in the case of sketch relative file.
-   * @param svgImageStr The SVG string to load which can be data:image or file://.
+   * @param pApplet The PApplet on whose behalf an SVG is being parsed. This
+   * must be given so that image can be retrieved in the case of sketch relative
+   * file.
+   * @param svgImageStr The SVG string to load which can be data:image or
+   * file://.
    * @return The image loaded as a PImage.
    */
   public PImage loadFromSvg(PApplet pApplet, String svgImageStr) {
@@ -114,8 +115,8 @@ public class ImageLoadFacade {
   /**
    * Load an image from a file.
    *
-   * @param pApplet The PApplet through which the image should be retrieved in the case of sketch
-   *     relative file (data folder for example).
+   * @param pApplet The PApplet through which the image should be retrieved in
+   * the case of sketch relative file (data folder for example).
    * @param path The path to the file to be opened.
    * @return The image loaded.
    */
@@ -126,10 +127,11 @@ public class ImageLoadFacade {
   /**
    * Load an image from a file using the given file extension.
    *
-   * @param pApplet The PApplet through which the image should be retrieved in the case of sketch
-   *     relative file (data folder for example).
+   * @param pApplet The PApplet through which the image should be retrieved in
+   * the case of sketch relative file (data folder for example).
    * @param path The path to the file to be opened.
-   * @param extension The extension with which the image should be loaded like "png".
+   * @param extension The extension with which the image should be loaded like
+   * "png".
    * @return The image loaded.
    */
   public PImage loadFromFile(PApplet pApplet, String path, String extension) {
@@ -142,8 +144,8 @@ public class ImageLoadFacade {
 
     // Find strategy for loading
     ImageLoadStrategy imageLoadStrategy = loadStrategies.getOrDefault(
-        extension,
-        defaultImageLoadStrategy
+      extension,
+      defaultImageLoadStrategy
     );
 
     // Load image

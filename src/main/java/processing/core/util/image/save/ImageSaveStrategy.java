@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,15 +20,14 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.save;
 
 import java.io.IOException;
 
-
 /**
- * Interface for strategies that can save images to different formats or via different methods.
+ * Interface for strategies that can save images to different formats or via
+ * different methods.
  */
 public interface ImageSaveStrategy {
 
@@ -41,9 +40,10 @@ public interface ImageSaveStrategy {
    * @param format The format as described in PConstants like PConstants.RGB.
    * @param filename The path to which the image should be written.
    * @return True if writting succeeded and false otherwise.
-   * @throws IOException Thrown if the file writing encountered an unexpected error.
+   * @throws IOException Thrown if the file writing encountered an unexpected
+   * error.
    */
   boolean save(int[] pixels, int pixelWidth, int pixelHeight, int format,
-               String filename) throws IOException;
+    String filename) throws IOException;
 
 }

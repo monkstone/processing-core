@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,21 +20,19 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.load;
 
 import processing.core.PApplet;
 import processing.core.PImage;
 
-
 /**
  * Image load strategy which uses a secondary strategy if failed.
  *
  * <p>
- * Image loading strategy strategy which attempts to load an image first through a "primary
- * strategy" and, if the primary failed, it then attemps loading through an alternative "secondary
- * strategy".
+ * Image loading strategy strategy which attempts to load an image first through
+ * a "primary strategy" and, if the primary failed, it then attemps loading
+ * through an alternative "secondary strategy".
  * </p>
  */
 public class FallbackImageLoadStrategy implements ImageLoadStrategy {
@@ -49,7 +47,7 @@ public class FallbackImageLoadStrategy implements ImageLoadStrategy {
    * @param newSecondaryStrategy The strategy to try if the first fails.
    */
   public FallbackImageLoadStrategy(ImageLoadStrategy newPrimaryStrategy,
-      ImageLoadStrategy newSecondaryStrategy) {
+    ImageLoadStrategy newSecondaryStrategy) {
 
     primaryStrategy = newPrimaryStrategy;
     secondaryStrategy = newSecondaryStrategy;

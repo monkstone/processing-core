@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,8 +20,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.save;
 
 import processing.core.PConstants;
@@ -30,57 +29,57 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 /**
  * Strategy for creating tga (targa32) images.
  */
 public class TgaImageSaveStrategy implements ImageSaveStrategy {
 
   /**
-   * Creates a Targa32 formatted byte sequence of specified
-   * pixel buffer using RLE compression.Also figured out how to avoid parsing the image upside-down
- (there's a header flag to set the image origin to top-left)
- 
- Starting with revision 0092, the format setting is taken into account:
-    <UL>
-    <LI><TT>ALPHA</TT> images written as 8bit grayscale (uses lowest byte)
-    <LI><TT>RGB</TT> &rarr; 24 bits
-    <LI><TT>ARGB</TT> &rarr; 32 bits
-    </UL>
- All versions are RLE compressed.
-   * 
+   * Creates a Targa32 formatted byte sequence of specified pixel buffer using
+   * RLE compression.Also figured out how to avoid parsing the image upside-down
+   * (there's a header flag to set the image origin to top-left)
+   *
+   * Starting with revision 0092, the format setting is taken into account:
+   * <UL>
+   * <LI><TT>ALPHA</TT> images written as 8bit grayscale (uses lowest byte)
+   * <LI><TT>RGB</TT> &rarr; 24 bits
+   * <LI><TT>ARGB</TT> &rarr; 32 bits
+   * </UL>
+   * All versions are RLE compressed.
+   *
    * Contributed by toxi 8-10 May 2005, based on this RLE
- <A HREF="http://www.wotsit.org/download.asp?f=tga">specification</A>
-     * @throws java.io.FileNotFoundException
+   * <A HREF="http://www.wotsit.org/download.asp?f=tga">specification</A>
+   *
+   * @throws java.io.FileNotFoundException
    */
   @Override
   public boolean save(int[] pixels, int pixelWidth, int pixelHeight, int format,
-      String filename) throws FileNotFoundException {
+    String filename) throws FileNotFoundException {
 
     OutputStream output = ImageSaveUtil.createForFile(filename);
 
     byte header[] = new byte[18];
 
-      switch (format) {
-          case PConstants.ALPHA:
-              // save ALPHA images as 8bit grayscale
-              header[2] = 0x0B;
-              header[16] = 0x08;
-              header[17] = 0x28;
-              break;
-          case PConstants.RGB:
-              header[2] = 0x0A;
-              header[16] = 24;
-              header[17] = 0x20;
-              break;
-          case PConstants.ARGB:
-              header[2] = 0x0A;
-              header[16] = 32;
-              header[17] = 0x28;
-              break;
-          default:
-              throw new RuntimeException("Image format not recognized inside save()");
-      }
+    switch (format) {
+      case PConstants.ALPHA:
+        // save ALPHA images as 8bit grayscale
+        header[2] = 0x0B;
+        header[16] = 0x08;
+        header[17] = 0x28;
+        break;
+      case PConstants.RGB:
+        header[2] = 0x0A;
+        header[16] = 24;
+        header[17] = 0x20;
+        break;
+      case PConstants.ARGB:
+        header[2] = 0x0A;
+        header[16] = 32;
+        header[17] = 0x28;
+        break;
+      default:
+        throw new RuntimeException("Image format not recognized inside save()");
+    }
     // set image dimensions lo-hi byte order
     header[12] = (byte) (pixelWidth & 0xff);
     header[13] = (byte) (pixelWidth >> 8);
@@ -103,7 +102,7 @@ public class TgaImageSaveStrategy implements ImageSaveStrategy {
           int rle = 1;
           currChunk[0] = col = pixels[index] & 0xff;
           while (index + rle < maxLen) {
-            if (col != (pixels[index + rle]&0xff) || rle == 128) {
+            if (col != (pixels[index + rle] & 0xff) || rle == 128) {
               isRLE = (rle > 1);
               break;
             }
@@ -120,13 +119,17 @@ public class TgaImageSaveStrategy implements ImageSaveStrategy {
               if ((col != cscan && rle < 128) || rle < 3) {
                 currChunk[rle] = col = cscan;
               } else {
-                if (col == cscan) rle -= 2;
+                if (col == cscan) {
+                  rle -= 2;
+                }
                 break;
               }
               rle++;
             }
             output.write(rle - 1);
-            for (int i = 0; i < rle; i++) output.write(currChunk[i]);
+            for (int i = 0; i < rle; i++) {
+              output.write(currChunk[i]);
+            }
           }
           index += rle;
         }
@@ -149,7 +152,9 @@ public class TgaImageSaveStrategy implements ImageSaveStrategy {
             output.write(col & 0xff);
             output.write(col >> 8 & 0xff);
             output.write(col >> 16 & 0xff);
-            if (format == PConstants.ARGB) output.write(col >>> 24 & 0xff);
+            if (format == PConstants.ARGB) {
+              output.write(col >>> 24 & 0xff);
+            }
 
           } else {  // not RLE
             rle = 1;
@@ -159,7 +164,9 @@ public class TgaImageSaveStrategy implements ImageSaveStrategy {
               } else {
                 // check if the exit condition was the start of
                 // a repeating colour
-                if (col == pixels[index + rle]) rle -= 2;
+                if (col == pixels[index + rle]) {
+                  rle -= 2;
+                }
                 break;
               }
               rle++;

@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,8 +20,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.load;
 
 import processing.core.PApplet;
@@ -31,7 +30,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-
 
 /**
  * Strategy to load an image through ImageIcon / abstract window toolkit.
@@ -51,10 +49,10 @@ public class AwtImageLoadStrategy implements ImageLoadStrategy {
         BufferedImage buffImage = (BufferedImage) awtImage;
         int space = buffImage.getColorModel().getColorSpace().getType();
         if (space == ColorSpace.TYPE_CMYK) {
-          System.err.println(path + " is a CMYK image, " +
-              "only RGB images are supported.");
+          System.err.println(path + " is a CMYK image, "
+            + "only RGB images are supported.");
           return null;
-              /*
+          /*
               // wishful thinking, appears to not be supported
               // https://community.oracle.com/thread/1272045?start=0&tstart=0
               BufferedImage destImage =
@@ -64,13 +62,13 @@ public class AwtImageLoadStrategy implements ImageLoadStrategy {
               ColorConvertOp op = new ColorConvertOp(null);
               op.filter(buffImage, destImage);
               image = new PImage(destImage);
-              */
+           */
         }
       }
 
       boolean checkAlpha = extension.equalsIgnoreCase("gif")
-          || extension.equalsIgnoreCase("png")
-          || extension.equalsIgnoreCase("unknown");
+        || extension.equalsIgnoreCase("png")
+        || extension.equalsIgnoreCase("unknown");
 
       PImage image = new PImage(awtImage, checkAlpha, pApplet);
       return image;

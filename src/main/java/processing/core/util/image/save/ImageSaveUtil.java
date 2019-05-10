@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,15 +20,13 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.save;
 
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-
 
 /**
  * Common convenience functions for file saving.
@@ -40,7 +38,7 @@ public class ImageSaveUtil {
    *
    * @param filename The filename at which the output stream should be created.
    * @return The newly created output stream.
-     * @throws java.io.FileNotFoundException
+   * @throws java.io.FileNotFoundException
    */
   public static OutputStream createForFile(String filename) throws FileNotFoundException {
     return new BufferedOutputStream(new FileOutputStream(filename), 32768);

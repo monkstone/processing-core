@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,8 +20,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image.save;
 
 import processing.core.util.image.constants.TifConstants;
@@ -30,7 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 /**
  * Strategy for saving tiff images.
  */
@@ -38,7 +36,7 @@ public class TiffImageSaveStrategy implements ImageSaveStrategy {
 
   @Override
   public boolean save(int[] pixels, int pixelWidth, int pixelHeight, int format,
-      String filename) throws FileNotFoundException {
+    String filename) throws FileNotFoundException {
 
     OutputStream output = ImageSaveUtil.createForFile(filename);
 
@@ -48,15 +46,15 @@ public class TiffImageSaveStrategy implements ImageSaveStrategy {
       System.err.println("Warning: only RGB information is saved with " +
                          ".tif files. Use .tga or .png for ARGB images and others.");
     }
-    */
+     */
     try {
       byte tiff[] = new byte[768];
       System.arraycopy(
-          TifConstants.TIFF_HEADER,
-          0,
-          tiff,
-          0,
-          TifConstants.TIFF_HEADER.length
+        TifConstants.TIFF_HEADER,
+        0,
+        tiff,
+        0,
+        TifConstants.TIFF_HEADER.length
       );
 
       tiff[30] = (byte) ((pixelWidth >> 8) & 0xff);
@@ -64,7 +62,7 @@ public class TiffImageSaveStrategy implements ImageSaveStrategy {
       tiff[42] = tiff[102] = (byte) ((pixelHeight >> 8) & 0xff);
       tiff[43] = tiff[103] = (byte) ((pixelHeight) & 0xff);
 
-      int count = pixelWidth*pixelHeight*3;
+      int count = pixelWidth * pixelHeight * 3;
       tiff[114] = (byte) ((count >> 24) & 0xff);
       tiff[115] = (byte) ((count >> 16) & 0xff);
       tiff[116] = (byte) ((count >> 8) & 0xff);

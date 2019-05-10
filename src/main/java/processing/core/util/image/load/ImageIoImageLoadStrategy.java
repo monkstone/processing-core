@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,9 +20,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
-
+ */
 package processing.core.util.image.load;
 
 import processing.core.PApplet;
@@ -33,7 +31,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicReference;
-
 
 /**
  * Use Java 1.4 ImageIO methods to load an image.
@@ -49,11 +46,11 @@ public class ImageIoImageLoadStrategy implements ImageLoadStrategy {
   /**
    * Load an image after checking that its format is supported.
    *
-   * @param pApplet The PApplet on whose behalf an image is being loaded. If null, cannot use sketch
-   *    relative file paths.
-   * @param path The path to the file like "subdirectory/file.png". Note that paths without
-   *    extensions are supported and the extension is not read off this path but instead must be
-   *    specified in the extension parameter.
+   * @param pApplet The PApplet on whose behalf an image is being loaded. If
+   * null, cannot use sketch relative file paths.
+   * @param path The path to the file like "subdirectory/file.png". Note that
+   * paths without extensions are supported and the extension is not read off
+   * this path but instead must be specified in the extension parameter.
    * @param extension The extension of the file to open.
    * @return The newly loaded image.
    */
@@ -77,7 +74,8 @@ public class ImageIoImageLoadStrategy implements ImageLoadStrategy {
   /**
    * Get the list of supported image formats.
    *
-   * @return List of image formats like "png" that are supported by this strategy.
+   * @return List of image formats like "png" that are supported by this
+   * strategy.
    */
   private String[] getLoadImageFormats() {
     cachedLoadImageFormats.compareAndSet(null, ImageIO.getReaderFormatNames());
@@ -87,11 +85,11 @@ public class ImageIoImageLoadStrategy implements ImageLoadStrategy {
   /**
    * Load an image without checking that its format is supported.
    *
-   * @param pApplet The PApplet on whose behalf an image is being loaded. If null, cannot use sketch
-   *    relative file paths.
-   * @param path The path to the file like "subdirectory/file.png". Note that paths without
-   *    extensions are supported and the extension is not read off this path but instead must be
-   *    specified in the extension parameter.
+   * @param pApplet The PApplet on whose behalf an image is being loaded. If
+   * null, cannot use sketch relative file paths.
+   * @param path The path to the file like "subdirectory/file.png". Note that
+   * paths without extensions are supported and the extension is not read off
+   * this path but instead must be specified in the extension parameter.
    * @return The newly loaded image.
    */
   private PImage loadImageIOInner(PApplet pApplet, String filename) {

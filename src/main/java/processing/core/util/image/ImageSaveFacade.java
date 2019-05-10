@@ -1,6 +1,6 @@
 /* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-/*
+ /*
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2012-18 The Processing Foundation
@@ -20,8 +20,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-*/
-
+ */
 package processing.core.util.image;
 
 import processing.core.PApplet;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
 
 /**
  * Facade to load PImages from various sources.
@@ -82,17 +80,19 @@ public class ImageSaveFacade {
    * @param pixels The raw representation of the image to save.
    * @param pixelWidth Width of the image in pixels.
    * @param pixelheight Height of the image in pixels.
-   * @param format Format corresponding to value in PConstants like PConstants.ARGB.
-   * @param filename The path at which the file should be saved like "test/path/output.png".
+   * @param format Format corresponding to value in PConstants like
+   * PConstants.ARGB.
+   * @param filename The path at which the file should be saved like
+   * "test/path/output.png".
    */
   public boolean save(int[] pixels, int pixelWidth, int pixelHeight, int format, String filename) {
     return save(
-        pixels,
-        pixelWidth,
-        pixelHeight,
-        format,
-        filename,
-        null
+      pixels,
+      pixelWidth,
+      pixelHeight,
+      format,
+      filename,
+      null
     );
   }
 
@@ -102,30 +102,32 @@ public class ImageSaveFacade {
    * @param pixels The raw representation of the image to save.
    * @param pixelWidth Width of the image in pixels.
    * @param pixelheight Height of the image in pixels.
-   * @param format Format corresponding to value in PConstants like PConstants.ARGB.
-   * @param filename The path at which the file should be saved like "test/path/output.png".
-   * @param pApplet The applet through which files should be saved when using sketch relative paths.
-   *    Can pass null if using absolute paths.
+   * @param format Format corresponding to value in PConstants like
+   * PConstants.ARGB.
+   * @param filename The path at which the file should be saved like
+   * "test/path/output.png".
+   * @param pApplet The applet through which files should be saved when using
+   * sketch relative paths. Can pass null if using absolute paths.
    */
   public boolean save(int[] pixels, int pixelWidth, int pixelHeight, int format, String filename,
-      PApplet pApplet) {
+    PApplet pApplet) {
 
     filename = preparePath(pApplet, filename);
 
     String extension = PathUtil.parseExtension(filename);
 
     ImageSaveStrategy imageSaveStrategy = saveStrategies.getOrDefault(
-        extension,
-        defaultImageSaveStrategy
+      extension,
+      defaultImageSaveStrategy
     );
 
     try {
       return imageSaveStrategy.save(
-          pixels,
-          pixelWidth,
-          pixelHeight,
-          format,
-          filename
+        pixels,
+        pixelWidth,
+        pixelHeight,
+        format,
+        filename
       );
     } catch (IOException e) {
       System.err.println("Error while saving image.");
@@ -141,11 +143,12 @@ public class ImageSaveFacade {
   /**
    * Ensure that the path is ready so that a file can be saved.
    *
-   * @param pApplet The applet through which files should be saved when using sketch relative paths.
-   *    Can pass null if using absolute paths.
-   * @param filename The filename that will be written and for which a path needs to be prepared.
-   * @return Completed path useable for writing like a file path that has been made relative to
-   *    the sketch folder.
+   * @param pApplet The applet through which files should be saved when using
+   * sketch relative paths. Can pass null if using absolute paths.
+   * @param filename The filename that will be written and for which a path
+   * needs to be prepared.
+   * @return Completed path useable for writing like a file path that has been
+   * made relative to the sketch folder.
    */
   private String preparePath(PApplet pApplet, String filename) {
     if (pApplet != null) {
@@ -157,9 +160,9 @@ public class ImageSaveFacade {
         PathUtil.createPath(file);
         return filename;
       } else {
-        String msg =
-            "PImage.save() requires an absolute path. " +
-                "Use createImage(), or pass savePath() to save().";
+        String msg
+          = "PImage.save() requires an absolute path. "
+          + "Use createImage(), or pass savePath() to save().";
 
         throw new SaveImageException(msg);
       }
